@@ -14,7 +14,7 @@ def handler(event, context):
         try:
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
-                original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key)
+                original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key.replace("/", "-"))
                 s3_client.download_file(bucket, key, original_obj_path)
 
                 print('Processing object {}...'.format(key))

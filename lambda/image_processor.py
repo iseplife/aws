@@ -8,7 +8,7 @@ class ImageProcessor:
         self.client = client
 
     def process(self, path, meta, key, ):
-        if meta["compress"]:
+        if meta["process"] == "compress":
             self.__compress(path, meta["size"], key)
         elif meta["process"] == "resize":
             self.__generate_thumbnails(path, meta.get("sizes", "").split(";"), key)
@@ -51,5 +51,5 @@ class ImageProcessor:
         if match:
             width = match[1] if match[1] != "auto" else match[2]
             height = match[2] if match[2] != "auto" else match[1]
-            return width, height
+            return int(width), int(height)
         raise Exception('{} is not a valid size format'.format(size))
