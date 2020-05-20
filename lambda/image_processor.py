@@ -29,14 +29,11 @@ class ImageProcessor:
         filename = path_frags[1].split(".")[0]
 
         if len(sizes) > 0:
-            for size in sizes:
-                try:
-                    self.client.upload_file(
-                        ImageProcessor.resize_image(path, filename, size, "JPEG"),
-                        self.bucket, '{}/{}/{}.jpg'.format(file_path, size, filename)
-                    )
-                except Exception as e:
-                    print(e)
+            for size in sizes: 
+                self.client.upload_file(
+                    ImageProcessor.resize_image(path, filename, size, "JPEG"),
+                    self.bucket, '{}/{}/{}.jpg'.format(file_path, size, filename)
+                )      
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
 

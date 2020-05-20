@@ -17,12 +17,17 @@ def handler(event, context):
                 original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key)
                 s3_client.download_file(bucket, key, original_obj_path)
 
+                print('Processing object {}...'.format(key))
                 if "vid/" in key:
                     processor = VideoProcessor(s3_client, bucket)
                 else:
                     processor = ImageProcessor(s3_client, bucket)
 
                 processor.process(original_obj_path, obj["Metadata"], key)
+                return {
+                    'statusCode': 200,
+                    'body': "Process executed successfully"
+                }
         except Exception as e:
             print(e)
             print('Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(key, bucket))
