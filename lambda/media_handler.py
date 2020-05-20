@@ -1,0 +1,31 @@
+from image_processor import ImageProcessor
+from video_processor import VideoProcessor
+import package.boto3 as boto3
+import uuid
+
+s3_client = boto3.client('s3')
+
+
+def handler(event, context):
+    for record in event['Records']:
+        bucket = record['s3']['bucket']['name']
+        key = record['s3']['object']['key']
+
+        try:
+            obj = s3_client.get_object(Bucket=bucket, Key=key)
+            if obj["Metadata"].get("process", 0):
+                original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key)
+                s3_client.download_file(bucket, key, original_obj_path)
+
+                if "vid/" in key:
+                    processor = VideoProcessor(s3_client, bucket)
+                else:
+                    processor = ImageProcessor(s3_client, bucket)
+
+                processor.process(original_obj_path, obj["Metadata"], key)
+        except Exception as e:
+            print(e)
+            print('Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(key, bucket))
+            raise e
+
+
