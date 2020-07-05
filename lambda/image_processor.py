@@ -49,17 +49,18 @@ class ImageProcessor:
     def resize_image(path, filename, size, ext=None):
         dest_path = '/tmp/{}-{}'.format(size, filename)
         with Image.open(path) as image:
-            image.thumbnail(ImageProcessor.parse_size(size))
+            image.thumbnail(ImageProcessor.parse_size(size, image.size))
             image.save(dest_path, ext)
         return dest_path
 
     @staticmethod
-    def parse_size(size):
+    def parse_size(size, original_size):
         print('parsing {}...'.format(size))
         match = re.match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
         if match:
-            width = match[1] if match[1] != "auto" else match[2]
-            height = match[2] if match[2] != "auto" else match[1]
+            width = match[1] if match[1] != "auto" else original_size[0]*(int(match[2])/original_size[1])
+            height = match[2] if match[2] != "auto" else original_size[1]*(int(match[1])/original_size[0])
+
             print('valid size format.'.format(size))
             return int(width), int(height)
         raise Exception('{} is not a valid size format'.format(size))
