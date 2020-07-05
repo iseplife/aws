@@ -27,7 +27,7 @@ class ImageProcessor:
             raise e
 
     def __generate_thumbnails(self, path, sizes, key):
-        print('Generating thumbnails...')
+        print('Generating thumbnails ({})...'.format(",".join(sizes)))
         path_frags = key.rsplit("/", 1)
         file_path = path_frags[0]
         filename = path_frags[1].split(".")[0]
@@ -35,7 +35,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, "jpg"),
+                    ImageProcessor.resize_image(path, filename, size, "JPEG"),
                     self.bucket,
                     '{}/{}/{}.jpg'.format(file_path, size, filename)
                 )
@@ -55,9 +55,11 @@ class ImageProcessor:
 
     @staticmethod
     def parse_size(size):
+        print('parsing {}...'.format(size))
         match = re.match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
         if match:
             width = match[1] if match[1] != "auto" else match[2]
             height = match[2] if match[2] != "auto" else match[1]
+            print('valid size format.'.format(size))
             return int(width), int(height)
         raise Exception('{} is not a valid size format'.format(size))
