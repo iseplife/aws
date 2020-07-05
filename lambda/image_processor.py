@@ -14,17 +14,20 @@ class ImageProcessor:
             self.__generate_thumbnails(path, meta.get("sizes", "").split(";"), key)
 
     def __compress(self, path, size, key):
+        print('Compressing image...')
         try:
             self.client.upload_file(
                 ImageProcessor.resize_image(path, key, size),
                 self.bucket,
                 '{}/{}/{}'.format(path, size, key)
             )
+            print('Compression over.')
         except Exception as e:
             print(e)
             raise e
 
     def __generate_thumbnails(self, path, sizes, key):
+        print('Generating thumbnails...')
         path_frags = key.rsplit("/", 1)
         file_path = path_frags[0]
         filename = path_frags[1].split(".")[0]
@@ -36,6 +39,9 @@ class ImageProcessor:
                     self.bucket,
                     '{}/{}/{}.jpg'.format(file_path, size, filename)
                 )
+                print('- Generate {} thumbnail.'.format(size))
+
+            print('Thumbnails generation over.')
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
 
