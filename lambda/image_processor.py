@@ -7,7 +7,7 @@ class ImageProcessor:
         self.bucket = bucket
         self.client = client
 
-    def process(self, path, meta, key, ):
+    def process(self, path, meta, key):
         if meta["process"] == "compress":
             self.__compress(path, meta["size"], key)
         elif meta["process"] == "resize":
@@ -16,7 +16,8 @@ class ImageProcessor:
     def __compress(self, path, size, key):
         try:
             self.client.upload_file(
-                ImageProcessor.resize_image(path, key, size), self.bucket,
+                ImageProcessor.resize_image(path, key, size),
+                self.bucket,
                 '{}/{}/{}'.format(path, size, key)
             )
         except Exception as e:
@@ -29,20 +30,21 @@ class ImageProcessor:
         filename = path_frags[1].split(".")[0]
 
         if len(sizes) > 0:
-            for size in sizes: 
+            for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, "JPEG"),
-                    self.bucket, '{}/{}/{}.jpg'.format(file_path, size, filename)
-                )      
+                    ImageProcessor.resize_image(path, filename, size, "jpg"),
+                    self.bucket,
+                    '{}/{}/{}.jpg'.format(file_path, size, filename)
+                )
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
 
     @staticmethod
-    def resize_image(path, filename, size, format=None):
+    def resize_image(path, filename, size, ext=None):
         dest_path = '/tmp/{}-{}'.format(size, filename)
         with Image.open(path) as image:
             image.thumbnail(ImageProcessor.parse_size(size))
-            image.save(dest_path, format)
+            image.save(dest_path, ext)
         return dest_path
 
     @staticmethod

@@ -14,10 +14,14 @@ def handler(event, context):
         try:
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
+                # Temporary path where we'll save original object
                 original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key.replace("/", "-"))
                 s3_client.download_file(bucket, key, original_obj_path)
 
                 print('Processing object {}...'.format(key))
+
+                # Videos are all stored in 'vid/' folder in S3 so if this part is in the key (pathname) then it is a video
+                # otherwise we considered it is a image. Documents are not processed as they don't have the 'process' metadata (yet ?)
                 if "vid/" in key:
                     processor = VideoProcessor(s3_client, bucket)
                 else:
