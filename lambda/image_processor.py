@@ -35,7 +35,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, "JPEG"),
+                    ImageProcessor.resize_image(path, filename, size),
                     self.bucket,
                     '{}/{}/{}.jpg'.format(file_path, size, filename)
                 )
