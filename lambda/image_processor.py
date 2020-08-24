@@ -49,6 +49,7 @@ class ImageProcessor:
     def resize_image(path, filename, size, ext=None):
         dest_path = '/tmp/{}-{}'.format(size, filename)
         with Image.open(path) as image:
+            image.convert("RGB")
             image.thumbnail(ImageProcessor.parse_size(size, image.size))
             image.save(dest_path, ext)
         return dest_path
