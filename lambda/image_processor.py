@@ -9,19 +9,26 @@ class ImageProcessor:
 
     def process(self, path, meta, key):
         if meta["process"] == "compress":
-            self.__compress(path, meta["size"], key)
+            self.__compress(path,  meta.get("sizes", "").split(";"), key)
         elif meta["process"] == "resize":
             self.__generate_thumbnails(path, meta.get("sizes", "").split(";"), key)
 
-    def __compress(self, path, size, key):
+    def __compress(self, path, sizes, key):
         print('Compressing image...')
         try:
-            self.client.upload_file(
-                ImageProcessor.resize_image(path, key, size),
-                self.bucket,
-                '{}/{}/{}'.format(path, size, key)
-            )
+            if len(sizes) > 0:
+                for size in sizes:
+                    self.client.upload_file(
+                        ImageProcessor.resize_image(path, key, size),
+                        self.bucket,
+                        '{}/{}/{}'.format(path, size, key)
+                    )
+                    print('- Generate {} thumbnail.'.format(size))
+            else:
+                raise Exception("Sizes should be specified in metadata, none found.")
+
             print('Compression over.')
+            self.client.delete_object(Bucket='iseplife', Key=key)
         except Exception as e:
             print(e)
             raise e
