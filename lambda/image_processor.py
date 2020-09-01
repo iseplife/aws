@@ -17,24 +17,21 @@ class ImageProcessor:
         print('Compressing image...')
         file_path, filename = key.rsplit("/", 1)
         name, ext = filename.rsplit(".", 1)
+        
+        if len(sizes) > 0:
+            for size in sizes:
+                self.client.upload_file(
+                    ImageProcessor.resize_image(path, filename, size),
+                    self.bucket,
+                    '{}/{}/{}'.format(file_path, size, filename)
+                )
+                print('- Generate {} thumbnail.'.format(size))
 
-        try:
-            if len(sizes) > 0:
-                for size in sizes:
-                    self.client.upload_file(
-                        ImageProcessor.resize_image(path, filename, size, ext),
-                        self.bucket,
-                        '{}/{}/{}'.format(path, size, key)
-                    )
-                    print('- Generate {} thumbnail.'.format(size))
-            else:
-                raise Exception("Sizes should be specified in metadata, none found.")
-
-            print('Compression over.')
             self.client.delete_object(Bucket='iseplife', Key=key)
-        except Exception as e:
-            print(e)
-            raise e
+            print('Compression over.')
+        else:
+            raise Exception("Sizes should be specified in metadata, none found.")
+
 
     def __generate_thumbnails(self, path, sizes, key):
         print('Generating thumbnails ({})...'.format(",".join(sizes)))
@@ -44,7 +41,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, ext),
+                    ImageProcessor.resize_image(path, filename, size),
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size, filename)
                 )
