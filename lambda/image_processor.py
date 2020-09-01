@@ -15,11 +15,14 @@ class ImageProcessor:
 
     def __compress(self, path, sizes, key):
         print('Compressing image...')
+        file_path, filename = key.rsplit("/", 1)
+        name, ext = filename.rsplit(".", 1)
+
         try:
             if len(sizes) > 0:
                 for size in sizes:
                     self.client.upload_file(
-                        ImageProcessor.resize_image(path, key, size),
+                        ImageProcessor.resize_image(path, filename, size, ext),
                         self.bucket,
                         '{}/{}/{}'.format(path, size, key)
                     )
