@@ -3,5 +3,5 @@ class VideoProcessor:
         self.bucket = bucket
         self.client = client
 
-    def process(self, path, meta, key, ):
+    def process(self, path, meta, key, dest_ext):
         pass

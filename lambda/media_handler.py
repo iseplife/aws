@@ -23,11 +23,11 @@ def handler(event, context):
                 # Videos are all stored in 'vid/' folder in S3 so if this part is in the key (pathname) then it is a video
                 # otherwise we considered it is a image. Documents are not processed as they don't have the 'process' metadata (yet ?)
                 if "vid/" in key:
-                    processor = VideoProcessor(s3_client, bucket)
+                    processor = VideoProcessor(s3_client, bucket,)
                 else:
                     processor = ImageProcessor(s3_client, bucket)
 
-                processor.process(original_obj_path, obj["Metadata"], key)
+                processor.process(original_obj_path, obj["Metadata"], key, obj["Metadata"].get("dest_ext", None))
                 return {
                     'statusCode': 200,
                     'body': "Process executed successfully"
