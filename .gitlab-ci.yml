@@ -19,4 +19,4 @@ build:
       - README.md
       - requirements.txt
     paths:
-        - .
+        - ./*
