@@ -3,12 +3,11 @@ image: docker:19.03.0
 stages:
   - build
 
-
 build:
   image: python:3.7.2-slim-stretch
   stage: build
   before_script:
-      - apt-get install python3-dev python3-setuptools
+      - apt update && apt install python3-dev python3-setuptools
       - pip install --upgrade pip
       - mkdir -p package
   script: 
