@@ -1,3 +1,4 @@
 Pillow
+future
 psycopg2-binary
 ffmpeg-python
