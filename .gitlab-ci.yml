@@ -1,32 +1,17 @@
 image: docker:19.03.0
 
 stages:
-  - deps
   - build
 
 
-deps:
+build:
   image: python:3.7.2-slim-stretch
-  stage: deps
+  stage: build
   before_script:
       - pip install --upgrade pip
       - mkdir -p package
   script: 
       - pip3 install -r requirements.txt --target=package
   artifacts:
-    expire_in: 1 hour  
     paths:
         - ./*
-
-
-build:
-  image: alpine:3.13.6
-  stage: build
-  dependencies: [deps]
-  before_script:
-      - apk update && apk add zip
-  script: 
-      - zip -q media_processor.zip ./*
-  artifacts:
-    paths:
-        - media_processor.zip 
