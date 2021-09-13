@@ -11,7 +11,7 @@ build:
       - pip install --upgrade pip
       - mkdir -p package
   script: 
-      - pip3 install --upgrade -r --target=package requirements.txt 
+      - pip3 install --upgrade --target=package -r requirements.txt 
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
