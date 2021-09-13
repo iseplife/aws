@@ -1,6 +1,6 @@
+from package import ffmpeg
 import tempfile
 import os
-from package import ffmpeg
 
 
 class VideoProcessor:

@@ -1,6 +1,6 @@
 from image_processor import ImageProcessor
 from video_processor import VideoProcessor
-import package.boto3 as boto3
+import boto3
 import package.psycopg2 as psycopg2
 import uuid
 import os
