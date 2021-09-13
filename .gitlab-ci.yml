@@ -4,7 +4,7 @@ stages:
   - build
 
 build:
-  image: 3.9-alpine3.14
+  image: python:3.9-alpine3.14
   stage: build
   before_script:
       - pip install --upgrade pip
