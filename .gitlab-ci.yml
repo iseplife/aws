@@ -15,7 +15,7 @@ build:
   artifacts:
     exclude:
       - .gitlab-ci.yml
-      - .git
+      - .git/*
       - README.md
       - requirements.txt
     paths:
