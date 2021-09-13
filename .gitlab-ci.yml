@@ -16,7 +16,7 @@ build:
     exclude:
       - .gitlab-ci.yml
       - .git/**/*
-      - .git/
+      - .git
       - README.md
       - requirements.txt
     paths:
