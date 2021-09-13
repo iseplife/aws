@@ -25,4 +25,7 @@ build:
   before_script:
       - apk update && apk add zip
   script: 
-      - zip -q media_processor.zip 
+      - zip -q media_processor.zip ./*
+  artifacts:
+    paths:
+        - media_processor.zip 
