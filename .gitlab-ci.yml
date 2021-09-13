@@ -14,6 +14,7 @@ deps:
   script: 
       - pip3 install -r requirements.txt --target=package
   artifacts:
+    expire_in: 1 hour  
     paths:
         - ./*
 
