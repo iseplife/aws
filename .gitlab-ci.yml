@@ -9,9 +9,10 @@ build:
   stage: build
   before_script:
       - pip install --upgrade pip
+      - pip uninstall pil
       - mkdir -p package
   script: 
-      - pip3 install -r requirements.txt --target=package
+      - pip3 install --upgrade -r --target=package requirements.txt 
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
