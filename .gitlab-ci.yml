@@ -13,6 +13,7 @@ build:
   script: 
       - pip3 install -r requirements.txt --target=package
   artifacts:
+    name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
       - .gitlab-ci.yml
       - .git/**/*
