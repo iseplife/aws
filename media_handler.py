@@ -7,6 +7,7 @@ from uuid import uuid4
 from image_processor import ImageProcessor
 from video_processor import VideoProcessor
 
+SIGNED_URL_TIMEOUT = 60
 s3_client = client('s3')
 # conn = psycopg2.connect(
 #     host=env['DB_HOST'],
@@ -30,10 +31,14 @@ def handler(event, context):
                 # conn.commit()
 
                 # Temporary path where we'll save original object
-                original_obj_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
-                s3_client.download_file(bucket, key, original_obj_path)
+                tmp_obj_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
+                s3_client.download_file(bucket, key, tmp_obj_path)
 
-                print('[INFO] processing object {}...'.format(key))
+                s3_source_signed_url = s3_client.generate_presigned_url(
+                    'get_object',
+                    Params={'Bucket': bucket, 'Key': key},
+                    ExpiresIn=SIGNED_URL_TIMEOUT
+                )
 
                 # Videos are all stored in 'vid/' folder in S3 so if this part is in the key (pathname) then it is a video
                 # otherwise we considered it is a image. Documents are not processed as they don't have the 'process' metadata (yet ?)
@@ -42,7 +47,13 @@ def handler(event, context):
                 else:
                     processor = ImageProcessor(s3_client, bucket)
 
-                processor.process(original_obj_path, obj["Metadata"], key, obj["Metadata"].get("dest_ext", None))
+                print('[INFO] processing object {}...'.format(key))
+                processor.process(
+                    s3_source_signed_url,
+                    obj["Metadata"],
+                    key,
+                    obj["Metadata"].get("dest_ext", None)
+                )
 
                 # try:
                 #     # Mark media as ready after processing

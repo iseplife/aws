@@ -61,8 +61,8 @@ class ImageProcessor:
     @staticmethod
     def parse_size(size, original_size):
         print('[INFO] parsing {}...'.format(size))
-        match = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
-        if match:
+        matched = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
+        if matched:
             width = match[1] if match[1] != "auto" else original_size[0] * (int(match[2]) / original_size[1])
             height = match[2] if match[2] != "auto" else original_size[1] * (int(match[1]) / original_size[0])
 
