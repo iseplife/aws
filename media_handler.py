@@ -1,17 +1,19 @@
-import package.psycopg2 as psycopg2
-import uuid
-import os
-from package.boto3 import client
+#import package.psycopg2 as psycopg2
+from boto3 import client
+from os import environ as env
+from uuid import uuid4
+
+
 from image_processor import ImageProcessor
 from video_processor import VideoProcessor
 
 s3_client = client('s3')
-conn = psycopg2.connect(
-    host=os.environ['DB_HOST'],
-    database=os.environ['DB_NAME'],
-    user=os.environ['DB_USER'],
-    password=os.environ['DB_PASSWORD']
-)
+# conn = psycopg2.connect(
+#     host=env['DB_HOST'],
+#     database=env['DB_NAME'],
+#     user=env['DB_USER'],
+#     password=env['DB_PASSWORD']
+# )
 
 
 def handler(event, context):
@@ -28,7 +30,7 @@ def handler(event, context):
                 # conn.commit()
 
                 # Temporary path where we'll save original object
-                original_obj_path = '/tmp/{}{}'.format(uuid.uuid4(), key.replace("/", "-"))
+                original_obj_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
                 s3_client.download_file(bucket, key, original_obj_path)
 
                 print('[INFO] processing object {}...'.format(key))

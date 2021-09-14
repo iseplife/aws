@@ -1,6 +1,5 @@
 from package.PIL import Image
-import os
-import re
+from re import match
 
 
 class ImageProcessor:
@@ -27,7 +26,7 @@ class ImageProcessor:
                 )
                 print('- Generate {} thumbnail.'.format(size))
 
-            self.client.delete_object(Bucket=os.environ['BUCKET_NAME'], Key=key)
+            self.client.delete_object(Bucket=self.bucket, Key=key)
             print('[INFO] compression over.')
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
@@ -62,7 +61,7 @@ class ImageProcessor:
     @staticmethod
     def parse_size(size, original_size):
         print('[INFO] parsing {}...'.format(size))
-        match = re.match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
+        match = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
         if match:
             width = match[1] if match[1] != "auto" else original_size[0] * (int(match[2]) / original_size[1])
             height = match[2] if match[2] != "auto" else original_size[1] * (int(match[1]) / original_size[0])
