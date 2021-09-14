@@ -28,7 +28,7 @@ def handler(event, context):
             if obj["Metadata"].get("process", 0):
                 # Mark media as being processed
                 cur = conn.cursor()
-                cur.execute("UPDATE media (status) VALUES ('PROCESSING') WHERE name=%s", (key,))
+                cur.execute("UPDATE media SET status ='PROCESSING' WHERE name=%s", (key,))
                 conn.commit()
 
                 # Temporary path where we'll save original object
@@ -59,7 +59,7 @@ def handler(event, context):
                 try:
                     # Mark media as ready after processing
                     cur = conn.cursor()
-                    cur.execute("UPDATE media (status) VALUES ('READY') WHERE name=%s", (key,))
+                    cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key,))
                     conn.commit()
                 except Exception as e:
                     print("Error updating media status in database (name: {})".format(key))
