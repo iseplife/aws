@@ -28,7 +28,7 @@ def handler(event, context):
             if obj["Metadata"].get("process", 0):
                 # Mark media as being processed
                 cur = conn.cursor()
-                cur.execute("UPDATE media (status) VALUES ('PROCESSING') WHERE name=%s", key)
+                cur.execute("UPDATE media (status) VALUES ('PROCESSING') WHERE name=%s", (key,))
                 conn.commit()
 
                 # Temporary path where we'll save original object
