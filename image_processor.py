@@ -1,5 +1,6 @@
 from PIL import Image
 from re import match
+from uuid import uuid4
 
 
 class ImageProcessor:
@@ -8,8 +9,9 @@ class ImageProcessor:
         self.client = client
 
     def process(self, path, meta, key, dest_ext):
+        # Temporary path where we'll save original object
         temp_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
-        s3_client.download_file(bucket, key, temp_path)
+        self.client.download_file(self.bucket, key, temp_path)
 
         if meta["process"] == "compress":
             self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
