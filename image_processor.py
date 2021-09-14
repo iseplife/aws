@@ -1,4 +1,5 @@
 from package.PIL import Image
+import os
 import re
 
 
@@ -26,7 +27,7 @@ class ImageProcessor:
                 )
                 print('- Generate {} thumbnail.'.format(size))
 
-            self.client.delete_object(Bucket='iseplife', Key=key)
+            self.client.delete_object(Bucket=os.environ['BUCKET_NAME'], Key=key)
             print('[INFO] compression over.')
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
