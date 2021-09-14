@@ -1,4 +1,4 @@
-from package import ffmpeg
+#from package import ffmpeg
 import tempfile
 import os
 
@@ -25,24 +25,24 @@ class VideoProcessor:
 
     @staticmethod
     def __compress(self, path, ext):
-        out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + "." + ext
+        # out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + "." + ext
 
-        media = ffmpeg.input(path)
-        audio = media.audio
-        video = media.video.filter("scale", -1, 720)
+        # media = ffmpeg.input(path)
+        # audio = media.audio
+        # video = media.video.filter("scale", -1, 720)
 
-        ffmpeg.output(video, audio, out_filename, vcodec='h264', acodec='aac').run()
+        # ffmpeg.output(video, audio, out_filename, vcodec='h264', acodec='aac').run()
 
-        return tempfile._get_default_tempdir() + os.path.sep + out_filename
+        # return tempfile._get_default_tempdir() + os.path.sep + out_filename
 
     @staticmethod
     def __generate_thumbnail(path):
-        out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + ".jpg"
-        (
-            ffmpeg
-                .input(path, ss=2)
-                .filter('scale', -1, 720)
-                .output(out_filename, vframes=1)
-                .run()
-        )
-        return out_filename
+        # out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + ".jpg"
+        # (
+        #     ffmpeg
+        #         .input(path, ss=2)
+        #         .filter('scale', -1, 720)
+        #         .output(out_filename, vframes=1)
+        #         .run()
+        # )
+        # return out_filename
