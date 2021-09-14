@@ -59,7 +59,7 @@ def handler(event, context):
                 try:
                     # Mark media as ready after processing
                     cur = conn.cursor()
-                    cur.execute("UPDATE media (status) VALUES ('READY') WHERE name=%s", key)
+                    cur.execute("UPDATE media (status) VALUES ('READY') WHERE name=%s", (key,))
                     conn.commit()
                 except Exception as e:
                     print("Error updating media status in database (name: {})".format(key))
