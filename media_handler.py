@@ -10,7 +10,11 @@ from video_processor import VideoProcessor
 SIGNED_URL_TIMEOUT = 60
 s3_client = client('s3')
 conn = psycopg2.connect(
-    f"host='{env['DB_HOST']}' dbname='{env['DB_NAME']}' user='{env['DB_USER']}' password='{env['DB_PASSWORD']}'"
+    host=env['DB_HOST'],
+    port=env['DB_PORT']
+    database=env['DB_NAME'],
+    user=env['DB_USER'],
+    password=env['DB_PASSWORD']
 )
 
 
