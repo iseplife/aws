@@ -1,5 +1,5 @@
 from PIL import Image
-from re import match
+import re
 from uuid import uuid4
 
 
@@ -66,8 +66,8 @@ class ImageProcessor:
     @staticmethod
     def parse_size(size, original_size):
         print('[INFO] parsing {}...'.format(size))
-        matched = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
-        if matched:
+        match = re.match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
+        if match:
             width = match[1] if match[1] != "auto" else original_size[0] * (int(match[2]) / original_size[1])
             height = match[2] if match[2] != "auto" else original_size[1] * (int(match[1]) / original_size[0])
 
