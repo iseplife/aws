@@ -8,7 +8,7 @@ build-ffmpeg-layer:
   image: lambci/lambda:build-python3.8
   stage: build-ffmpeg-layer
   before_script:
-      - yum check-update && yum install -y xz wget
+      - yum install -y wget
   script:
       - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
       - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
