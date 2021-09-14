@@ -1,4 +1,4 @@
 Pillow
 future
-psycopg2-binary
+aws-psycopg2
 ffmpeg-python
