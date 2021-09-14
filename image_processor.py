@@ -14,7 +14,7 @@ class ImageProcessor:
             self.__generate_thumbnails(path, meta.get("sizes", "").split(";"), key, dest_ext)
 
     def __compress(self, path, sizes, key, dest_ext):
-        print('Compressing image...')
+        print('[INFO] compressing image...')
         file_path, filename = key.rsplit("/", 1)
 
         if len(sizes) > 0:
@@ -27,12 +27,12 @@ class ImageProcessor:
                 print('- Generate {} thumbnail.'.format(size))
 
             self.client.delete_object(Bucket='iseplife', Key=key)
-            print('Compression over.')
+            print('[INFO] compression over.')
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
 
     def __generate_thumbnails(self, path, sizes, key, dest_ext):
-        print('Generating thumbnails ({})...'.format(",".join(sizes)))
+        print('[INFO] generating thumbnails ({})...'.format(",".join(sizes)))
         file_path, filename = key.rsplit("/", 1)
 
         if len(sizes) > 0:
@@ -44,7 +44,7 @@ class ImageProcessor:
                 )
                 print('- Generate {} thumbnail.'.format(size))
 
-            print('Thumbnails generation over.')
+            print('[INFO] thumbnails generation over.')
         else:
             raise Exception("Sizes should be specified in metadata, none found.")
 
@@ -60,12 +60,12 @@ class ImageProcessor:
 
     @staticmethod
     def parse_size(size, original_size):
-        print('parsing {}...'.format(size))
+        print('[INFO] parsing {}...'.format(size))
         match = re.match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
         if match:
             width = match[1] if match[1] != "auto" else original_size[0] * (int(match[2]) / original_size[1])
             height = match[2] if match[2] != "auto" else original_size[1] * (int(match[1]) / original_size[0])
 
-            print('valid size format.'.format(size))
+            print('[INFO] valid size format.'.format(size))
             return int(width), int(height)
         raise Exception('{} is not a valid size format'.format(size))

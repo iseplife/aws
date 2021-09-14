@@ -25,6 +25,7 @@ class VideoProcessor:
 
     @staticmethod
     def __compress(self, path, ext):
+        print('[INFO] compressing video...')
         # out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + "." + ext
 
         # media = ffmpeg.input(path)
@@ -37,6 +38,7 @@ class VideoProcessor:
 
     @staticmethod
     def __generate_thumbnail(path):
+        print('[INFO] generating video thumbnail...')
         # out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + ".jpg"
         # (
         #     ffmpeg
