@@ -4,16 +4,12 @@ stages:
   - build
 
 build:
-  image: python:3.9-bullseye
+  image: lambci/lambda:build-python3.8
   stage: build
   before_script:
-      - apt update
-      - apt install -y build-essential libpq-dev python3-dev patchelf
       - pip install --upgrade pip
   script:
       - pip3 install -U -t package -r requirements.txt
-      - cd package && cp -L $(ldd PIL/_imaging.so|grep libjpeg|awk '{print $3}') PIL/
-      - patchelf --set-rpath PIL PIL/_imaging.so
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
