@@ -1,4 +1,4 @@
-#import package.psycopg2 as psycopg2
+import package.psycopg2 as psycopg2
 import uuid
 import os
 from package.boto3 import client
@@ -6,12 +6,12 @@ from image_processor import ImageProcessor
 from video_processor import VideoProcessor
 
 s3_client = client('s3')
-# conn = psycopg2.connect(
-#     host=os.environ['DB_HOST'],
-#     database=os.environ['DB_NAME'],
-#     user=os.environ['DB_USER'],
-#     password=os.environ['DB_PASSWORD']
-# )
+conn = psycopg2.connect(
+    host=os.environ['DB_HOST'],
+    database=os.environ['DB_NAME'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASSWORD']
+)
 
 
 def handler(event, context):

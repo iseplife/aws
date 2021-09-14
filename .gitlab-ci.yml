@@ -7,15 +7,19 @@ build:
   image: lambci/lambda:build-python3.8
   stage: build
   before_script:
+      - 
       - pip install --upgrade pip
   script:
       - pip3 install -U -t package -r requirements.txt
+      - mkdir -p package/psycopg2 && cd package/psycopg2 
+      - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
       - .gitlab-ci.yml
       - .git/**/*
       - .git
+      - .gitignore
       - README.md
       - requirements.txt
     paths:
