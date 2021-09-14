@@ -14,6 +14,7 @@ build:
       - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8 && mv psycopg2-3.8 psycopg2
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
+    expire_in: 1 day
     exclude:
       - .gitlab-ci.yml
       - .git/**/*
