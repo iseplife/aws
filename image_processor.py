@@ -1,4 +1,4 @@
-from package.PIL import Image
+from PIL import Image
 from re import match
 
 
