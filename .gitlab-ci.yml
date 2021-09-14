@@ -2,16 +2,11 @@ image: docker:19.03.0
 
 stages:
   - build
+  - build-deps
 
 build:
   image: lambci/lambda:build-python3.8
   stage: build
-  before_script:
-      - pip install --upgrade pip
-  script:
-      - pip3 install -U -t package -r requirements.txt
-      - cd package 
-      - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8 && mv psycopg2-3.8 psycopg2
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     expire_in: 1 day
@@ -24,3 +19,20 @@ build:
       - requirements.txt
     paths:
         - ./*
+
+build-deps:
+  image: lambci/lambda:build-python3.8
+  stage: build-deps
+  dependencies:
+    - build
+  before_script:
+      - pip install --upgrade pip
+  script:
+      - pip3 install -U -t package -r requirements.txt
+      - cd package 
+      - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8 && mv psycopg2-3.8 psycopg2
+  artifacts:
+    name: "media-processor-deps-$CI_COMMIT_SHORT_SHA"
+    expire_in: 1 day
+    paths:
+        - package/*
