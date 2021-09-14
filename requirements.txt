@@ -1,4 +1,3 @@
 Pillow
-future
-
+boto3
 ffmpeg-python

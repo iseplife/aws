@@ -1,7 +1,7 @@
 #import package.psycopg2 as psycopg2
 import uuid
 import os
-from boto3 import client
+from package.boto3 import client
 from image_processor import ImageProcessor
 from video_processor import VideoProcessor
 
