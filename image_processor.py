@@ -8,10 +8,13 @@ class ImageProcessor:
         self.client = client
 
     def process(self, path, meta, key, dest_ext):
+        temp_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
+        s3_client.download_file(bucket, key, temp_path)
+
         if meta["process"] == "compress":
-            self.__compress(path, meta.get("sizes", "").split(";"), key, dest_ext)
+            self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
         elif meta["process"] == "resize":
-            self.__generate_thumbnails(path, meta.get("sizes", "").split(";"), key, dest_ext)
+            self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
 
     def __compress(self, path, sizes, key, dest_ext):
         print('[INFO] compressing image...')
