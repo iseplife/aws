@@ -10,8 +10,8 @@ build:
       - pip install --upgrade pip
   script:
       - pip3 install -U -t package -r requirements.txt
-      - mkdir -p package/psycopg2 && cd package/psycopg2 
-      - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8
+      - cd package 
+      - svn export -q https://github.com/jkehler/awslambda-psycopg2/trunk/psycopg2-3.8 && mv psycopg2-3.8 psycopg2
   artifacts:
     name: "media-processor-$CI_COMMIT_SHORT_SHA"
     exclude:
