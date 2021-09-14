@@ -1,4 +1,4 @@
-#import package.psycopg2 as psycopg2
+import  psycopg2
 from boto3 import client
 from os import environ as env
 from uuid import uuid4
@@ -9,12 +9,12 @@ from video_processor import VideoProcessor
 
 SIGNED_URL_TIMEOUT = 60
 s3_client = client('s3')
-# conn = psycopg2.connect(
-#     host=env['DB_HOST'],
-#     database=env['DB_NAME'],
-#     user=env['DB_USER'],
-#     password=env['DB_PASSWORD']
-# )
+conn = psycopg2.connect(
+    host=env['DB_HOST'],
+    database=env['DB_NAME'],
+    user=env['DB_USER'],
+    password=env['DB_PASSWORD']
+)
 
 
 def handler(event, context):
@@ -26,9 +26,9 @@ def handler(event, context):
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
                 # Mark media as being processed
-                # cur = conn.cursor()
-                # cur.execute("UPDATE media (status) VALUES ('PROCESSING') WHERE name=%s", key)
-                # conn.commit()
+                cur = conn.cursor()
+                cur.execute("UPDATE media (status) VALUES ('PROCESSING') WHERE name=%s", key)
+                conn.commit()
 
                 # Temporary path where we'll save original object
                 tmp_obj_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
@@ -55,19 +55,19 @@ def handler(event, context):
                     obj["Metadata"].get("dest_ext", None)
                 )
 
-                # try:
-                #     # Mark media as ready after processing
-                #     cur = conn.cursor()
-                #     cur.execute("UPDATE media (status) VALUES ('READY') WHERE name=%s", key)
-                #     conn.commit()
-                # except Exception as e:
-                #     print("Error updating media status in database (name: {})".format(key))
-                #     print(e)
-                #     raise e
-                # finally:
-                #     # Close communication with database
-                #     cur.close()
-                #     conn.close()
+                try:
+                    # Mark media as ready after processing
+                    cur = conn.cursor()
+                    cur.execute("UPDATE media (status) VALUES ('READY') WHERE name=%s", key)
+                    conn.commit()
+                except Exception as e:
+                    print("Error updating media status in database (name: {})".format(key))
+                    print(e)
+                    raise e
+                finally:
+                    # Close communication with database
+                    cur.close()
+                    conn.close()
 
                 return {
                     'statusCode': 200,

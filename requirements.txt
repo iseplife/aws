@@ -1,1 +1,2 @@
 Pillow
+aws-psycopg2

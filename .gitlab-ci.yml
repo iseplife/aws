@@ -1,7 +1,26 @@
 image: docker:19.03.0
 
 stages:
+  - build-ffmpeg-layer
   - build-python-deps
+
+build-ffmpeg-layer:
+  image: lambci/lambda:build-python3.8
+  stage: build-ffmpeg-layer
+  when: manual
+  before_script:
+      - yum install -y wget
+  script:
+      - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+      - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
+      - md5sum -c ffmpeg-release-amd64-static.tar.xz.md5
+      - tar xvf ffmpeg-release-amd64-static.tar.xz
+      - mkdir -p ffmpeg/bin && cp -r $(ls . | grep -E "^ffmpeg-.*static$")/ffmpeg ffmpeg/bin/
+  artifacts:
+    name: "media-processor-ffmpeg-layer-$CI_COMMIT_SHORT_SHA"
+    expire_in: 1 day
+    paths:
+        - ffmpeg/*
 
 build-python-deps:
   image: lambci/lambda:build-python3.8
@@ -15,6 +34,7 @@ build-python-deps:
     name: "media-processor-deps-layer-$CI_COMMIT_SHORT_SHA"
     expire_in: 1 day
     exclude:
+      - ffmpeg
       - .gitlab-ci.yml
       - .git/**/*
       - .git
