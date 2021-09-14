@@ -14,7 +14,7 @@ s3_client = client('s3')
 # )
 
 
-def handler(event, context):
+def handler(event):
     for record in event['Records']:
         bucket = record['s3']['bucket']['name']
         key = record['s3']['object']['key']
