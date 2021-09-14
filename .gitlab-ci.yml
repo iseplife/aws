@@ -33,6 +33,7 @@ build-python-deps:
     name: "media-processor-deps-layer-$CI_COMMIT_SHORT_SHA"
     expire_in: 1 day
     exclude:
+      - ffmpeg
       - .gitlab-ci.yml
       - .git/**/*
       - .git
