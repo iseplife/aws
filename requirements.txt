@@ -1,5 +1,4 @@
 Pillow
 boto3
-past
 future
 ffmpeg-python
