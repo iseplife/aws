@@ -4,7 +4,7 @@ stages:
   - build
 
 build:
-  image: python:3.9-slim-bullseye
+  image: lambci/lambda:build-python3.8
   stage: build
   before_script:
       - pip install --upgrade pip
