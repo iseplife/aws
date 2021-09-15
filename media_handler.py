@@ -1,7 +1,6 @@
 import  psycopg2
 from boto3 import client
 from os import environ as env
-from uuid import uuid4
 
 
 from image_processor import ImageProcessor
@@ -31,9 +30,7 @@ def handler(event, context):
                 cur.execute("UPDATE media SET status ='PROCESSING' WHERE name=%s", (key,))
                 conn.commit()
 
-                # Temporary path where we'll save original object
-                tmp_obj_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
-                s3_client.download_file(bucket, key, tmp_obj_path)
+            
 
                 s3_source_signed_url = s3_client.generate_presigned_url(
                     'get_object',
@@ -74,6 +71,8 @@ def handler(event, context):
                     'statusCode': 200,
                     'body': "Process executed successfully"
                 }
+            else:
+                print("[INFO] object skipped (no process metadata)")
         except Exception as e:
             print(e)
             print('Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(key, bucket))

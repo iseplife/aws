@@ -29,7 +29,7 @@ class ImageProcessor:
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size, filename)
                 )
-                print('- Generate {} thumbnail.'.format(size))
+                print('[INFO] generate {} thumbnail.'.format(size))
 
             self.client.delete_object(Bucket=self.bucket, Key=key)
             print('[INFO] compression over.')
@@ -47,7 +47,7 @@ class ImageProcessor:
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size, filename)
                 )
-                print('- Generate {} thumbnail.'.format(size))
+                print('[INFO] generate {} thumbnail.'.format(size))
 
             print('[INFO] thumbnails generation over.')
         else:
