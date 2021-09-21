@@ -63,9 +63,9 @@ def handler(event, context):
                     print(e)
                     raise e
                 finally:
-                    # Close communication with database
+                    # We do not close connection to database as the same container can be reused for a following object
+                    # as the conn variable is not defined in the function, its value is "frozen"
                     cur.close()
-                    conn.close()
 
                 return {
                     'statusCode': 200,
