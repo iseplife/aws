@@ -12,14 +12,15 @@ class VideoProcessor:
     def process(self, path, meta, key, dest_ext=None):
         key_path, key_ext = key.rsplit(".", 1)
 
+        temp_video = self.__compress(path, dest_ext or key_ext)
         self.client.upload_file(
-            self.__compress(path, dest_ext or key_ext),
+            temp_video,
             self.bucket,
             f'{key_path}.{dest_ext or key_ext}'
         )
 
         self.client.upload_file(
-            self.__generate_thumbnail(path),
+            self.__generate_thumbnail(temp_video),
             self.bucket,
             f'{key_path}.jpg'
         )
@@ -34,6 +35,7 @@ class VideoProcessor:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+
 
         return out_filename
 
