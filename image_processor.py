@@ -59,18 +59,22 @@ class ImageProcessor:
         with Image.open(path) as image:
             if image.mode in ("RGBA", "P"):
                 image = image.convert("RGB")
-            image.thumbnail(ImageProcessor.parse_size(size, image.size))
-            image.save(dest_path, ext)
+            
+            parsed = ImageProcessor.parse_size(size, image.size)
+            
+            image.thumbnail([parsed[0], parsed[1]])
+            image.save(dest_path, 'webp', optimize = True, quality = parsed[2])
         return dest_path
 
     @staticmethod
     def parse_size(size, original_size):
         print('[INFO] parsing {}...'.format(size))
-        matched = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)", size)
+        matched = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)/?(\d+)?", size)
         if matched:
             width = matched[1] if matched[1] != "auto" else original_size[0] * (int(matched[2]) / original_size[1])
             height = matched[2] if matched[2] != "auto" else original_size[1] * (int(matched[1]) / original_size[0])
+            quality = matched[3] or 80
 
             print('[INFO] valid size format.'.format(size))
-            return int(width), int(height)
+            return int(width), int(height), int(quality)
         raise Exception('{} is not a valid size format'.format(size))
