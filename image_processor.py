@@ -71,8 +71,16 @@ class ImageProcessor:
         print('[INFO] parsing {}...'.format(size))
         matched = match(r"(?!autoxauto)(\d+|auto)x(\d+|auto)/?(\d+)?", size)
         if matched:
-            width = matched[1] if matched[1] != "auto" else original_size[0] * (int(matched[2]) / original_size[1])
-            height = matched[2] if matched[2] != "auto" else original_size[1] * (int(matched[1]) / original_size[0])
+            wantedWidth = matched[1]
+            wantedHeight = matched[2]
+            if wantedWidth != "auto" and int(wantedWidth) > original_size[0]:
+                wantedWidth = original_size[0]
+            if wantedHeight != "auto" and int(wantedHeight) > original_size[1]:
+                wantedHeight = original_size[1]
+
+            width = wantedWidth if wantedWidth != "auto" else original_size[0] * (int(wantedHeight) / original_size[1])
+            height = wantedHeight if wantedHeight != "auto" else original_size[1] * (int(wantedWidth) / original_size[0])
+
             quality = matched[3] or 80
 
             print('[INFO] valid size format.'.format(size))
