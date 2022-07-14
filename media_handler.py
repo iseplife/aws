@@ -24,6 +24,7 @@ def handler(event, context):
         key = record['s3']['object']['key']
 
         try:
+            print("[INFO] getting object...")
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
                 try:
@@ -78,7 +79,7 @@ def handler(event, context):
                     'body': "Process executed successfully"
                 }
             else:
-                print("[INFO] object skipped (no process metadata)")
+                print(f"[INFO] object {key} skipped (no process metadata)")
         except Exception as e:
             print('Error raised when trying to process object {} from bucket {}.'.format(key, bucket))
             cur.execute("UPDATE media SET status = 'ERROR' WHERE name=%s", (key,))
