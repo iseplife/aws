@@ -22,7 +22,7 @@ deploy-prod:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script:
-    - aws lambda update-function-code --function-name PROD-iseplifeMediaProcessing --zip-file "fileb://${BUILD_FILE}"
+    - aws lambda update-function-code --function-name DEV-iseplifeMediaProcessing --zip-file "fileb://${BUILD_FILE}"
   dependencies:
     - build-zip
   rules:
