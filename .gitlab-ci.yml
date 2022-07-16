@@ -10,6 +10,7 @@ stages:
 
 test-compileall:
   stage: test
+  image: python:3.9-slim-bullseye
   script: 
     - echo "Checking that python files compile"
     - python -m compileall  *.py
