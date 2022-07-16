@@ -17,6 +17,8 @@ class ImageProcessor:
             self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
         elif meta["process"] == "resize":
             self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
+        
+        return True
 
     def __compress(self, path, sizes, key, dest_ext):
         print('[INFO] compressing image...')

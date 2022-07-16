@@ -52,17 +52,16 @@ def handler(event, context):
                             processor = ImageProcessor(s3_client, bucket)
 
                         print('[INFO] processing object {}...'.format(key))
-                        processor.process(
+                        if processor.process(
                             s3_source_signed_url,
                             obj["Metadata"],
                             key,
                             obj["Metadata"].get("dest_ext", None)
-                        )
-                    
-                        # Mark media as ready after processing
-                        cur = conn.cursor()
-                        cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key,))
-                        conn.commit()
+                        ):
+                            # Mark media as ready after processing
+                            cur = conn.cursor()
+                            cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key,))
+                            conn.commit()
                     except Exception as e:
                         print('Error raised when trying to process object {} from bucket {}.'.format(key, bucket))
                         cur.execute("UPDATE media SET status = 'ERROR' WHERE name=%s", (key,))
@@ -108,6 +107,9 @@ def handler(event, context):
                             key,
                             obj["Metadata"].get("dest_ext", None)
                         )
+                        cur = conn.cursor()
+                        cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key_id,))
+                        conn.commit()
                 else:
                     processor = VideoCompressor(s3_client, bucket)
 

@@ -32,7 +32,7 @@ class VideoCompressor:
         out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + "." + ext
 
         sp = subprocess.run(
-            shlex.split(f"/opt/bin/ffmpeg -i {path} -vcodec h264 -crf 26 -preset fast -c:a aac -b:a 96k -movflags +faststart -vf scale=-2:720 -profile:v baseline -fpsmax 50 -ar 44100 {out_filename}"),
+            shlex.split(f"/opt/bin/ffmpeg -i {path} -vcodec h264 -crf 26 -preset faster -c:a aac -b:a 96k -movflags +faststart -vf scale=-2:1080 -profile:v baseline -fpsmax 50 -ar 44100 {out_filename}"),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
