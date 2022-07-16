@@ -4,8 +4,15 @@ variables:
   BUILD_FILE: "media-processor.zip"
 
 stages:
+  - test
   - build
   - deploy
+
+test-compileall:
+  stage: test
+  script: 
+    - echo "Checking that python files compile"
+    - python -m compileall  *.py
 
 build-zip:
   stage: build
@@ -14,6 +21,8 @@ build-zip:
     - apk add --update zip
   script:
     - zip -r $BUILD_FILE *.py
+  dependencies:
+    - test-compileall
   artifacts:
     paths:
       - ./$BUILD_FILE
