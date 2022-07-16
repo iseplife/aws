@@ -25,7 +25,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size.split("/")[0], dest_ext),
+                    cls.resize_image(path, filename, size.split("/")[0], dest_ext),
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
@@ -43,7 +43,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size.split("/")[0], dest_ext),
+                    cls.resize_image(path, filename, size.split("/")[0], dest_ext),
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size, filename)
                 )
@@ -54,16 +54,16 @@ class ImageProcessor:
             raise Exception("Sizes should be specified in metadata, none found.")
 
     @staticmethod
-    def resize_image(path, filename, size, ext=None):
+    def resize_image(path, filename, size, extension='webp'):
         dest_path = '/tmp/{}-{}'.format(size, filename)
         with Image.open(path) as image:
             if image.mode in ("RGBA", "P"):
                 image = image.convert("RGB")
             
-            parsed = ImageProcessor.parse_size(size, image.size)
+            parsed = cls.parse_size(size, image.size)
             
             image.thumbnail([parsed[0], parsed[1]])
-            image.save(dest_path, 'webp', optimize = True, quality = parsed[2])
+            image.save(dest_path, extension, optimize = True, quality = parsed[2])
         return dest_path
 
     @staticmethod
