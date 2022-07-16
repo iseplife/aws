@@ -9,14 +9,6 @@ from video_processor import VideoProcessor
 
 SIGNED_URL_TIMEOUT = 60
 s3_client = client('s3')
-conn = psycopg2.connect(
-    host=env['DB_HOST'],
-    port=env['DB_PORT'],
-    database=env['DB_NAME'],
-    user=env['DB_USER'],
-    password=env['DB_PASSWORD']
-)
-
 
 def handler(event, context):
     for record in event['Records']:
@@ -27,6 +19,13 @@ def handler(event, context):
             print("[INFO] getting object...")
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
+                conn = psycopg2.connect(
+                    host=env['DB_HOST'],
+                    port=env['DB_PORT'],
+                    database=env['DB_NAME'],
+                    user=env['DB_USER'],
+                    password=env['DB_PASSWORD']
+                )
                 try:
                     # Mark media as being processed
                     cur = conn.cursor()
