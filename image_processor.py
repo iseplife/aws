@@ -47,7 +47,7 @@ class ImageProcessor:
                 self.client.upload_file(
                     ImageProcessor.resize_image(path, filename, size.split("/")[0], dest_ext),
                     self.bucket,
-                    '{}/{}/{}'.format(file_path, size, filename)
+                    '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
                 print('[INFO] generate {} thumbnail.'.format(size))
 
