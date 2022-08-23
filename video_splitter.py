@@ -12,9 +12,9 @@ class VideoSplitter:
     def process(self, path, meta, key, dest_ext=None):
         key_path, key_ext = key.rsplit(".", 1)
 
-        seg_folder = tempfile._get_default_tempdir() + os.path.sep + "/segments"
+        seg_folder = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + os.path.sep + "segments"
 
-        os.mkdir(seg_folder)
+        os.makedirs(seg_folder)
 
         print("[INFO] Splitting video...")
         sp = subprocess.run(
