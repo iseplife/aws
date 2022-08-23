@@ -22,6 +22,27 @@ class VideoBundler:
             key_id,
         )
 
+    def screen(self, path, dest):
+        print("[INFO] Taking screenshot of first frame...")
+        out_filename = tempfile._get_default_tempdir() + os.path.sep + next(tempfile._get_candidate_names()) + ".webp"
+
+        sp = subprocess.run(
+            shlex.split(f'/opt/bin/ffmpeg -i {path} -vframes 1 -vf scale=-2:1080 {out_filename}'),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        destBase = dest.split("/")[-1].split(".")[-2]
+
+        print(f"[INFO] Screenshot taken ! Saving it at {destBase}.webp ...")
+
+        self.client.upload_file(
+            out_filename,
+            self.bucket,
+            f'vid/thumb/{destBase}.webp'
+        )
+        print(f"[INFO] Done !")
+
     def bundle(self,vidpart):
         compressed, max, key_id, folder = vidpart
 
@@ -39,6 +60,9 @@ class VideoBundler:
                 Params={'Bucket': self.bucket, 'Key': key},
                 ExpiresIn=SIGNED_URL_TIMEOUT
             )
+
+            if i == 0:
+                self.screen(s3_source_signed_url, key_id)
 
             files = f"{files}file '{s3_source_signed_url}'"
 
