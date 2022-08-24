@@ -13,12 +13,27 @@ class ImageProcessor:
         temp_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
         self.client.download_file(self.bucket, key, temp_path)
 
+        if meta["process"] == "overwrite":
+            self.__overwrite(temp_path, meta.get("size", ""), key, dest_ext)
         if meta["process"] == "compress":
             self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
         elif meta["process"] == "resize":
             self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
         
         return True
+
+    def __overwrite(self, path, size, key, dest_ext):
+        print('[INFO] overwriting image...')
+        file_path, filename = key.rsplit("/", 1)
+
+        self.client.upload_file(
+            ImageProcessor.resize_image(path, filename, size, dest_ext),
+            self.bucket,
+            key
+        )
+        
+        print('[INFO] overwrite {} thumbnail.'.format(size))
+        print('[INFO] compression over.')
 
     def __compress(self, path, sizes, key, dest_ext):
         print('[INFO] compressing image...')
@@ -27,7 +42,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size.split("/")[0], dest_ext),
+                    ImageProcessor.resize_image(path, filename, size, dest_ext),
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
@@ -45,7 +60,7 @@ class ImageProcessor:
         if len(sizes) > 0:
             for size in sizes:
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size.split("/")[0], dest_ext),
+                    ImageProcessor.resize_image(path, filename, size, dest_ext),
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
@@ -57,7 +72,7 @@ class ImageProcessor:
 
     @staticmethod
     def resize_image(path, filename, size, extension='webp'):
-        dest_path = '/tmp/{}-{}'.format(size, filename)
+        dest_path = '/tmp/{}-{}'.format(size.split("/")[0], filename)
         with Image.open(path) as image:
             if image.mode in ("RGBA", "P"):
                 image = image.convert("RGB")
