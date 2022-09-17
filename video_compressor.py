@@ -25,7 +25,8 @@ class VideoCompressor:
                 }
             }
         )
-
+        os.remove(temp_video)
+        
     @staticmethod
     def __compress(path, ext):
         print('[INFO] compressing video...')

@@ -21,6 +21,7 @@ class VideoBundler:
             self.bucket,
             key_id,
         )
+        os.remove(temp_video)
 
     def screen(self, path, dest):
         print("[INFO] Taking screenshot of first frame...")
@@ -41,6 +42,8 @@ class VideoBundler:
             self.bucket,
             f'vid/thumb/{destBase}.webp'
         )
+
+        os.remove(out_filename)
         print(f"[INFO] Done !")
 
     def bundle(self,vidpart):

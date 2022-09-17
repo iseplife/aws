@@ -32,8 +32,9 @@ class VideoSplitter:
         filesLength = len(files)
         for file in files:
             print(f"[INFO] File detected : {file}, sending.")
+            temp_path = f"{seg_folder}{os.path.sep}{file}"
             self.client.upload_file(
-                f"{seg_folder}{os.path.sep}{file}",
+                temp_path,
                 self.bucket,
                 f'tmp/{key_path}/{file}',
                 ExtraArgs={
@@ -42,6 +43,8 @@ class VideoSplitter:
                     }
                 }
             )
+            os.remove(temp_path)
+
         print("[INFO] Deleting original...")
         self.client.delete_object(Bucket=self.bucket, Key=key)
         print("[INFO] Job done.")
