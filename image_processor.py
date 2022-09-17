@@ -13,14 +13,15 @@ class ImageProcessor:
         temp_path = '/tmp/{}{}'.format(uuid4(), key.replace("/", "-"))
         self.client.download_file(self.bucket, key, temp_path)
 
-        if meta["process"] == "overwrite":
-            self.__overwrite(temp_path, meta.get("size", ""), key, dest_ext)
-        if meta["process"] == "compress":
-            self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
-        elif meta["process"] == "resize":
-            self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
-
-        os.remove(temp_path)
+        try:
+            if meta["process"] == "overwrite":
+                self.__overwrite(temp_path, meta.get("size", ""), key, dest_ext)
+            if meta["process"] == "compress":
+                self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
+            elif meta["process"] == "resize":
+                self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
+        finally:
+            os.remove(temp_path)
         
         return True
 
@@ -28,13 +29,15 @@ class ImageProcessor:
         print('[INFO] overwriting image...')
         file_path, filename = key.rsplit("/", 1)
 
-        temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
-        self.client.upload_file(
-            temp_path,
-            self.bucket,
-            key
-        )
-        os.remove(temp_path)
+        computed_file_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
+        try:
+            self.client.upload_file(
+                computed_file_path,
+                self.bucket,
+                key
+            )
+        finally:
+            os.remove(computed_file_path)
         
         print('[INFO] overwrite {} thumbnail.'.format(size))
         print('[INFO] compression over.')
@@ -45,13 +48,15 @@ class ImageProcessor:
 
         if len(sizes) > 0:
             for size in sizes:
-                temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
-                self.client.upload_file(
-                    temp_path,
-                    self.bucket,
-                    '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
-                )
-                os.remove(temp_path)
+                computed_file_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
+                try:
+                    self.client.upload_file(
+                        computed_file_path,
+                        self.bucket,
+                        '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
+                    )
+                finally:
+                    os.remove(computed_file_path)
                 print('[INFO] generate {} thumbnail.'.format(size))
 
             self.client.delete_object(Bucket=self.bucket, Key=key)
@@ -65,13 +70,15 @@ class ImageProcessor:
 
         if len(sizes) > 0:
             for size in sizes:
-                temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
-                self.client.upload_file(
-                    temp_path,
-                    self.bucket,
-                    '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
-                )
-                os.remove(temp_path)
+                computed_file_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
+                try:
+                    self.client.upload_file(
+                        computed_file_path,
+                        self.bucket,
+                        '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
+                    )
+                finally:
+                    os.remove(computed_file_path)
                 print('[INFO] generate {} thumbnail.'.format(size))
 
             print('[INFO] thumbnails generation over.')

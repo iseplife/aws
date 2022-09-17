@@ -14,14 +14,15 @@ class VideoBundler:
         compressed, max, key_id, folder = meta["vidpart"].split(",")
 
         temp_video = self.bundle(meta["vidpart"].split(","))
-
-        print(f"[INFO] Bundling "+meta["vidpart"])
-        self.client.upload_file(
-            temp_video,
-            self.bucket,
-            key_id,
-        )
-        os.remove(temp_video)
+        try:
+            print(f"[INFO] Bundling "+meta["vidpart"])
+            self.client.upload_file(
+                temp_video,
+                self.bucket,
+                key_id,
+            )
+        finally:
+            os.remove(temp_video)
 
     def screen(self, path, dest):
         print("[INFO] Taking screenshot of first frame...")
@@ -36,14 +37,14 @@ class VideoBundler:
         destBase = dest.split("/")[-1].split(".")[-2]
 
         print(f"[INFO] Screenshot taken ! Saving it at {destBase}.webp ...")
-
-        self.client.upload_file(
-            out_filename,
-            self.bucket,
-            f'vid/thumb/{destBase}.webp'
-        )
-
-        os.remove(out_filename)
+        try:
+            self.client.upload_file(
+                out_filename,
+                self.bucket,
+                f'vid/thumb/{destBase}.webp'
+            )
+        finally:
+            os.remove(out_filename)
         print(f"[INFO] Done !")
 
     def bundle(self,vidpart):
