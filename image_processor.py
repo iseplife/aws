@@ -1,6 +1,7 @@
 from PIL import Image
 from re import match
 from uuid import uuid4
+import os
 
 
 class ImageProcessor:
