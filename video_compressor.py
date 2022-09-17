@@ -13,19 +13,20 @@ class VideoCompressor:
         key_path, key_ext = key.rsplit(".", 1)
 
         temp_video = self.__compress(path, dest_ext or key_ext)
-        
-        compressed, max, key_id, folder = meta["vidpart"].split(",")
-        self.client.upload_file(
-            temp_video,
-            self.bucket,
-            f'{key_path}.{dest_ext or key_ext}',
-            ExtraArgs={
-                'Metadata': {
-                    'vidpart': f"compressed,{max},{key_id},{folder}"
+        try:
+            compressed, max, key_id, folder = meta["vidpart"].split(",")
+            self.client.upload_file(
+                temp_video,
+                self.bucket,
+                f'{key_path}.{dest_ext or key_ext}',
+                ExtraArgs={
+                    'Metadata': {
+                        'vidpart': f"compressed,{max},{key_id},{folder}"
+                    }
                 }
-            }
-        )
-        os.remove(temp_video)
+            )
+        finally:
+            os.remove(temp_video)
         
     @staticmethod
     def __compress(path, ext):
