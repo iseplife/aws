@@ -19,6 +19,8 @@ class ImageProcessor:
             self.__compress(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
         elif meta["process"] == "resize":
             self.__generate_thumbnails(temp_path, meta.get("sizes", "").split(";"), key, dest_ext)
+
+        os.remove(temp_path)
         
         return True
 
@@ -26,11 +28,13 @@ class ImageProcessor:
         print('[INFO] overwriting image...')
         file_path, filename = key.rsplit("/", 1)
 
+        temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
         self.client.upload_file(
-            ImageProcessor.resize_image(path, filename, size, dest_ext),
+            temp_path,
             self.bucket,
             key
         )
+        os.remove(temp_path)
         
         print('[INFO] overwrite {} thumbnail.'.format(size))
         print('[INFO] compression over.')
@@ -41,11 +45,13 @@ class ImageProcessor:
 
         if len(sizes) > 0:
             for size in sizes:
+                temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, dest_ext),
+                    temp_path,
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
+                os.remove(temp_path)
                 print('[INFO] generate {} thumbnail.'.format(size))
 
             self.client.delete_object(Bucket=self.bucket, Key=key)
@@ -59,11 +65,13 @@ class ImageProcessor:
 
         if len(sizes) > 0:
             for size in sizes:
+                temp_path = ImageProcessor.resize_image(path, filename, size, dest_ext)
                 self.client.upload_file(
-                    ImageProcessor.resize_image(path, filename, size, dest_ext),
+                    temp_path,
                     self.bucket,
                     '{}/{}/{}'.format(file_path, size.split("/")[0], filename)
                 )
+                os.remove(temp_path)
                 print('[INFO] generate {} thumbnail.'.format(size))
 
             print('[INFO] thumbnails generation over.')
