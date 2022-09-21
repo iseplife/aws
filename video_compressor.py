@@ -13,20 +13,17 @@ class VideoCompressor:
         key_path, key_ext = key.rsplit(".", 1)
 
         temp_video = self.__compress(path, dest_ext or key_ext)
-        try:
-            compressed, max, key_id, folder = meta["vidpart"].split(",")
-            self.client.upload_file(
-                temp_video,
-                self.bucket,
-                f'{key_path}.{dest_ext or key_ext}',
-                ExtraArgs={
-                    'Metadata': {
-                        'vidpart': f"compressed,{max},{key_id},{folder}"
-                    }
+        compressed, max, key_id, folder = meta["vidpart"].split(",")
+        self.client.upload_file(
+            temp_video,
+            self.bucket,
+            f'{key_path}.{dest_ext or key_ext}',
+            ExtraArgs={
+                'Metadata': {
+                    'vidpart': f"compressed,{max},{key_id},{folder}"
                 }
-            )
-        finally:
-            os.remove(temp_video)
+            }
+        )
         
     @staticmethod
     def __compress(path, ext):
@@ -36,8 +33,9 @@ class VideoCompressor:
         sp = subprocess.run(
             shlex.split(f"/opt/bin/ffmpeg -i {path} -vcodec h264 -crf 27 -preset faster -c:a aac -b:a 96k -movflags +faststart -vf scale=-2:1080 -profile:v baseline -fpsmax 50 -ar 44100 {out_filename}"),
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            text=True
         )
-
+        print(sp.stderr)
 
         return out_filename
