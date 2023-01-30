@@ -7,9 +7,9 @@ from os import environ as env
 from image_processor import ImageProcessor
 from video_compressor import VideoCompressor
 from video_bundler import VideoBundler
-from video_splitter import VideoSplitter
+from video_split_processor import VideoSplitProcessor
 
-SIGNED_URL_TIMEOUT = 60
+SIGNED_URL_TIMEOUT = 3 * 60
 s3_client = client('s3')
 def connectDatabase():
     return psycopg2.connect(
@@ -46,7 +46,7 @@ def handler(event, context):
                         # Videos are all stored in 'vid/' folder in S3 so if this part is in the key (pathname) then it is a video
                         # otherwise we considered it is a image. Documents are not processed as they don't have the 'process' metadata (yet ?)
                         if "vid/" in key:
-                            processor = VideoSplitter(s3_client, bucket)
+                            processor = VideoSplitProcessor(s3_client, bucket)
                         else:
                             processor = ImageProcessor(s3_client, bucket)
 
