@@ -18,7 +18,7 @@ class VideoSplitter:
 
         print("[INFO] Splitting video...")
         sp = subprocess.run(
-            shlex.split(f"/opt/bin/ffmpeg -i {path} -c copy -map 0 -segment_time 00:00:20 -reset_timestamps 1 -f segment {seg_folder}/%d.mp4"),
+            shlex.split(f"/opt/bin/ffmpeg -i {path} -c copy -map 0 -segment_time 00:00:10 -reset_timestamps 1 -f segment {seg_folder}/%d.mp4"),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
