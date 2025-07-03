@@ -1,8 +1,7 @@
+import requests
 import psycopg2
-from psycopg2 import OperationalError
 from boto3 import client
 from os import environ as env
-
 
 from image_processor import ImageProcessor
 from video_compressor import VideoCompressor
@@ -11,21 +10,38 @@ from video_split_processor import VideoSplitProcessor
 
 SIGNED_URL_TIMEOUT = 3 * 60
 s3_client = client('s3')
-database = ""
-def connectDatabase():
-    global database
-    if database != "":
-        return database
-    database = psycopg2.connect(
+
+def connect_database():
+    """
+    Connect to the database for video processing operations
+    """
+    return psycopg2.connect(
         host=env['DB_HOST'],
         port=env['DB_PORT'],
         database=env['DB_NAME'],
         user=env['DB_USER'],
         password=env['DB_PASSWORD']
     )
-    return database
 
-conn = connectDatabase()
+def update_media_status(media_name, status):
+    """
+    Update media status using the API endpoint
+    """
+    api_domain = env['API_DOMAIN']
+    secret_token = env['API_SECRET_TOKEN']
+    
+    url = f"https://{api_domain}/media/lambda/set-state/{status}"
+    
+    payload = {
+        'secret_token': secret_token,
+        'name': media_name
+    }
+    
+    response = requests.post(url, data=payload)
+    response.raise_for_status()
+    return response
+
+
 
 def handler(event, context):
     for record in event['Records']:
@@ -38,9 +54,7 @@ def handler(event, context):
             if obj["Metadata"].get("process", 0):
                 try:
                     # Mark media as being processed
-                    cur = conn.cursor()
-                    cur.execute("UPDATE media SET status ='PROCESSING' WHERE name=%s", (key,))
-                    conn.commit()
+                    update_media_status(key, 'PROCESSING')
 
                     try:
                         s3_source_signed_url = s3_client.generate_presigned_url(
@@ -64,26 +78,17 @@ def handler(event, context):
                             obj["Metadata"].get("dest_ext", None)
                         ):
                             # Mark media as ready after processing
-                            cur = conn.cursor()
-                            cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key,))
-                            conn.commit()
+                            update_media_status(key, 'READY')
                     except Exception as e:
                         print('Error raised when trying to process object {} from bucket {}.'.format(key, bucket))
-                        cur.execute("UPDATE media SET status = 'ERROR' WHERE name=%s", (key,))
-                        conn.commit()
+                        update_media_status(key, 'ERROR')
                         print(e)
                         raise e
-                except OperationalError as e:
-                    cur = conn.cursor()
-                    cur.execute("UPDATE media SET status = 'ERROR' WHERE name=%s", (key,))
-                    conn.commit()
-                    print("OperationalError with psycopg when updating media status in database (name: {})".format(key))
+                except Exception as e:
+                    update_media_status(key, 'ERROR')
+                    print("Error when updating media status via API (name: {})".format(key))
                     print(e)
                     raise e
-                finally:
-                    # We do not close connection to database as the same container can be reused for a following object
-                    # as the conn variable is not defined in the function, its value is "frozen"
-                    cur.close()
 
                 return {
                     'statusCode': 200,
@@ -93,26 +98,32 @@ def handler(event, context):
                 compressed, max, key_id, folder = obj["Metadata"]["vidpart"].split(",")
 
                 if compressed == "compressed":
-                    cur = conn.cursor()
-                    cur.execute("UPDATE media SET compressed_parts = compressed_parts + 1 WHERE name=%s", (key_id,))
-                    conn.commit()
-
-                    cur = conn.cursor()
-                    cur.execute("SELECT compressed_parts FROM media WHERE name=%s", (key_id,))
-                    compressed_parts = cur.fetchone()[0]
-                    print(f"Now {compressed_parts}/{max} parts compressed for {key_id} / {key}")
-
-                    if compressed_parts == int(max):
-                        print("[INFO] Reached end, bundling...")
-                        processor = VideoBundler(s3_client, bucket)
-                        processor.process(
-                            obj["Metadata"],
-                            key,
-                            obj["Metadata"].get("dest_ext", None)
-                        )
+                    conn = connect_database()
+                    try:
                         cur = conn.cursor()
-                        cur.execute("UPDATE media SET status = 'READY' WHERE name=%s", (key_id,))
+                        cur.execute("UPDATE media SET compressed_parts = compressed_parts + 1 WHERE name=%s", (key_id,))
                         conn.commit()
+
+                        cur.execute("SELECT compressed_parts FROM media WHERE name=%s", (key_id,))
+                        compressed_parts = cur.fetchone()[0]
+                        cur.close()
+                        conn.close()
+                        
+                        print(f"Now {compressed_parts}/{max} parts compressed for {key_id} / {key}")
+
+                        if compressed_parts == int(max):
+                            print("[INFO] Reached end, bundling...")
+                            processor = VideoBundler(s3_client, bucket)
+                            processor.process(
+                                obj["Metadata"],
+                                key,
+                                obj["Metadata"].get("dest_ext", None)
+                            )
+                            update_media_status(key_id, 'READY')
+                    except Exception as e:
+                        cur.close()
+                        conn.close()
+                        raise e
                 else:
                     processor = VideoCompressor(s3_client, bucket)
 
