@@ -11,14 +11,21 @@ from video_split_processor import VideoSplitProcessor
 
 SIGNED_URL_TIMEOUT = 3 * 60
 s3_client = client('s3')
+database = ""
 def connectDatabase():
-    return psycopg2.connect(
+    global database
+    if database != "":
+        return database
+    database = psycopg2.connect(
         host=env['DB_HOST'],
         port=env['DB_PORT'],
         database=env['DB_NAME'],
         user=env['DB_USER'],
         password=env['DB_PASSWORD']
     )
+    return database
+
+conn = connectDatabase()
 
 def handler(event, context):
     for record in event['Records']:
@@ -29,7 +36,6 @@ def handler(event, context):
             print("[INFO] getting object...")
             obj = s3_client.get_object(Bucket=bucket, Key=key)
             if obj["Metadata"].get("process", 0):
-                conn = connectDatabase()
                 try:
                     # Mark media as being processed
                     cur = conn.cursor()
@@ -87,8 +93,6 @@ def handler(event, context):
                 compressed, max, key_id, folder = obj["Metadata"]["vidpart"].split(",")
 
                 if compressed == "compressed":
-                    conn = connectDatabase()
-
                     cur = conn.cursor()
                     cur.execute("UPDATE media SET compressed_parts = compressed_parts + 1 WHERE name=%s", (key_id,))
                     conn.commit()
